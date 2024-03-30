@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y git ninja-build libglib2.0-0 libsm6 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install mmcv-full==1.3.18 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.8.0/index.html
-RUN git clone --recurse-submodules https://github.com/rlleshi/phar.git phar
+RUN git clone --recurse-submodules --branch yarnball https://github.com/orangekittysoftware/phar.git phar
 
 # install mmaction, mmpose, mmdet
 WORKDIR /workspace/phar/mmaction2
