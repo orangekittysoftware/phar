@@ -526,9 +526,18 @@ def main():
     if video.rotation in (90, 270):
         video = video.resize(video.size[::-1])
         video.rotation = 0
-    video_resized = video.resize(height=480)
+
     out_video = osp.join(TEMP, osp.basename(args.video))
-    video_resized.write_videofile(out_video)
+
+    if video.h != 480:
+        video_resized = video.resize(height=480)
+        video_resized.write_videofile(out_video)
+    else:
+        CONSOLE.print('Skipping resize, it is already 480 tall...', style='green')
+        video_resized = video
+        # Just copy the file to the temp location
+        shutil.copy(args.video, out_video)
+
     args.original_video = args.video
     args.video = out_video
     extract_clips(args.video, args.subclip_len, args.num_processes)
