@@ -368,6 +368,10 @@ def audio_inference(clip: str, coeffs: list):
     subprocess.run(['ffmpeg', '-i', clip, '-map', '0:a', '-y', out_audio],
                    capture_output=True)
     time.sleep(1)
+    if osp.exists(out_audio):
+        verbose_print(f'Generated WAV for clip {clip}', style='yellow')
+    else:
+        verbose_print(f'FAILED to generated Wav for some reason for clip {clip}', style='yellow')
 
     data, rate = sf.read(out_audio)
     meter = pyln.Meter(rate)  # meter works with decibels
@@ -378,9 +382,14 @@ def audio_inference(clip: str, coeffs: list):
         return
 
     out_feature = f'{osp.splitext(out_audio)[0]}.npy'
-    subprocess.run(
-        ['python', AUDIO_FEATURE_SCRIPT, TEMP, TEMP, '--ext', 'wav'],
+    exec_result = subprocess.run(
+        ['python', AUDIO_FEATURE_SCRIPT, TEMP, TEMP, '--ext', 'wav', '--level', '0'],
         capture_output=True)
+    if osp.exists(out_feature):
+        verbose_print(f'Generated audio feature for clip {clip}', style='yellow')
+    else:
+        verbose_print(f'FAILED to generated feature file for some reason for clip {clip}', style='yellow')
+        return
 
     results = inference_recognizer(AUDIO_MODEL, out_feature)
     results = [(AUDIO_LABELS[k[0]], k[1]) for k in results]
@@ -526,9 +535,18 @@ def main():
     if video.rotation in (90, 270):
         video = video.resize(video.size[::-1])
         video.rotation = 0
-    video_resized = video.resize(height=480)
+
     out_video = osp.join(TEMP, osp.basename(args.video))
-    video_resized.write_videofile(out_video)
+
+    if video.h != 480:
+        video_resized = video.resize(height=480)
+        video_resized.write_videofile(out_video)
+    else:
+        CONSOLE.print('Skipping resize, it is already 480 tall...', style='green')
+        video_resized = video
+        # Just copy the file to the temp location
+        shutil.copy(args.video, out_video)
+
     args.original_video = args.video
     args.video = out_video
     extract_clips(args.video, args.subclip_len, args.num_processes)
