@@ -7,6 +7,10 @@ ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0 8.0+PTX"
 ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
 ENV CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
 
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+
 # ! https://github.com/NVIDIA/nvidia-docker/issues/1632
 # currently image not working properly
 RUN apt-key del 7fa2af80
@@ -42,3 +46,9 @@ RUN wget https://github.com/rlleshi/phar/releases/download/v1.0.0/audio.pth -O c
     && wget https://download.openmmlab.com/mmpose/top_down/hrnet/hrnet_w32_coco_256x192-c78dce93_20200708.pth -O checkpoints/pose/hrnet_w32_coco_256x192.pth \
     && wget http://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_2x_coco/faster_rcnn_r50_fpn_2x_coco_bbox_mAP-0.384_20200504_210434-a5d8aa15.pth \
     -O checkpoints/detector/faster_rcnn_r50_fpn_1x_coco-person.pth
+
+# TEMP FIX - Force upgrade of numpy to 1.23.0
+RUN pip install numpy==1.23.0 --upgrade
+
+# TEMP - Copy in local source code changes to make dev easier?
+COPY src src
