@@ -371,7 +371,7 @@ def audio_inference(clip: str, coeffs: list):
     if osp.exists(out_audio):
         verbose_print(f'Generated WAV for clip {clip}', style='yellow')
     else:
-        verbose_print(f'FAILED to generated Wav for some reason for clip {clip}', style='yellow')
+        verbose_print(f'FAILED to generate WAV for some reason for clip {clip}', style='yellow')
         PREDS[clip]['audio'] = placeholder
         return
 
@@ -390,7 +390,7 @@ def audio_inference(clip: str, coeffs: list):
     if osp.exists(out_feature):
         verbose_print(f'Generated audio feature for clip {clip}', style='yellow')
     else:
-        verbose_print(f'FAILED to generated feature file for some reason for clip {clip}', style='yellow')
+        verbose_print(f'FAILED to generate feature file for some reason for clip {clip}', style='yellow')
         PREDS[clip]['audio'] = placeholder
         return
 
