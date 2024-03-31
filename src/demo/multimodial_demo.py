@@ -39,6 +39,7 @@ except (ImportError, ModuleNotFoundError):
 
 sys.path.append('./mmaction2')
 
+VERSION = '0.0.1'
 FONTFACE = cv2.FONT_HERSHEY_DUPLEX
 FONTSCALE = 0.85
 FONTCOLOR = (255, 255, 0)  # BGR, white
@@ -481,10 +482,26 @@ def write_results_json(args: dict):
         args (dict): _description_
     """
     results = []
+
+    # Coerce float32 back down to float for serialization. There is not that much precision in this data anyway.
+    for c in PREDS:
+        for m in PREDS[c]:
+            for l in PREDS[c][m]:
+                PREDS[c][m][l] = float(PREDS[c][m][l])
+
     for c in PREDS:
         results.append(get_weighted_scores(c, args.coefficients))
     with open(args.out, 'w') as js:
-        json.dump(results, js)
+        js_out = {
+            'inference_engine': 'phar',
+            'weighted_results': results,
+            'raw_predictions': PREDS,
+            'video_input': args.video,
+            'execution_duration_secs': args.duration,
+            'data_format_version': VERSION,
+            'inference_model_version': VERSION,
+        }
+        json.dump(js_out, js)
     CONSOLE.print(f'Wrote results to {args.out}', style='green')
 
 
@@ -585,6 +602,8 @@ def main():
     verbose_print(PREDS)
 
     if args.out.endswith('.json'):
+        # TODO tramp data
+        args.duration = time.time() - start_time
         write_results_json(args)
     else:
         write_results_video(args)
