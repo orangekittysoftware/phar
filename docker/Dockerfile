@@ -42,3 +42,6 @@ RUN wget https://github.com/rlleshi/phar/releases/download/v1.0.0/audio.pth -O c
     && wget https://download.openmmlab.com/mmpose/top_down/hrnet/hrnet_w32_coco_256x192-c78dce93_20200708.pth -O checkpoints/pose/hrnet_w32_coco_256x192.pth \
     && wget http://download.openmmlab.com/mmdetection/v2.0/faster_rcnn/faster_rcnn_r50_fpn_2x_coco/faster_rcnn_r50_fpn_2x_coco_bbox_mAP-0.384_20200504_210434-a5d8aa15.pth \
     -O checkpoints/detector/faster_rcnn_r50_fpn_1x_coco-person.pth
+
+# Create mount dirs
+RUN mkdir /var/in /var/out
